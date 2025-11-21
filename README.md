@@ -6,6 +6,7 @@ Backend untuk aplikasi **Catatan**, dibangun dengan Python + FastAPI.
 
 ## 📂 Struktur Proyek
 
+```json
 backend/
 ├── api/
 │ ├── init.py
@@ -14,6 +15,7 @@ backend/
 │ └── service.py # Business Logic
 ├── requirements.txt
 └── vercel.json
+```
 
 
 ---
