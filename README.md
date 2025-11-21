@@ -1,24 +1,48 @@
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fhello-world&demo-title=Python%20Hello%20World&demo-description=Use%20Python%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fpython-hello-world.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994600/random/python.png)
+# 📝 Catatan App Backend (Python)
 
-# Python Hello World
+Backend untuk aplikasi **Catatan**, dibangun dengan Python + FastAPI.  
 
-This example shows how to use Python on Vercel with Serverless Functions using the [Python Runtime](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/python).
+---
 
-## Demo
+## 📂 Struktur Proyek
 
-https://python-hello-world.vercel.app/
+backend/
+├── api/
+│ ├── init.py
+│ ├── index.py # Entry point untuk Vercel
+│ ├── models.py # Pydantic Schemas
+│ └── service.py # Business Logic
+├── requirements.txt
+└── vercel.json
 
-## Running Locally
 
+---
+
+## 🚀 Fitur Utama
+
+- ⚡ FastAPI untuk performa cepat dan modern  
+- 🧹 Validasi clean code dengan Pydantic  
+- 🧠 Service-layer architecture untuk pemisahan logic  
+
+---
+
+## 🛠 Instalasi & Setup
+
+### 1. Clone repository
 ```bash
-npm i -g vercel
-vercel dev
+git clone <repo-url>
+cd backend
 ```
 
-Your Python API is now available at `http://localhost:3000/api`.
+### 2. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
-## One-Click Deploy
+3. Jalankan server lokal
+```bash
+uvicorn api.index:app --reload
+```
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Fhello-world&demo-title=Python%20Hello%20World&demo-description=Use%20Python%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fpython-hello-world.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994600/random/python.png)
+Akses via:
+http://localhost:8000
