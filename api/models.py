@@ -1,16 +1,20 @@
-from pydantic import BaseModel, Field
-from typing import Optional
+from sqlalchemy import Column, String, Text
+from pydantic import BaseModel, ConfigDict
+from .database import Base
 import uuid
 
-class NoteBase(BaseModel):
-    title: str = Field(..., min_length=1, description="Judul catatan")
-    content: str = Field(..., description="Isi catatan")
+class NoteTable(Base):
+    __tablename__ = "notes" 
 
-class NoteCreate(NoteBase):
-    pass
+    id = Column(String, primary_key=True, index=True, default=lambda: str(uuid.uuid4()))
+    title = Column(String, index=True)
+    content = Column(Text)
 
-class Note(NoteBase):
+class NoteInput(BaseModel):
+    title: str
+    content: str
+
+class NoteOutput(NoteInput):
     id: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)

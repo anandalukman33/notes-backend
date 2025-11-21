@@ -1,28 +1,49 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException
+from sqlalchemy.orm import Session
 from typing import List
-from .models import Note, NoteCreate
-from .service import note_service
 
-app = FastAPI(title="Notes API 2025", docs_url="/docs", redoc_url=None)
+from . import models, database
 
-@app.get("/notes", response_model=List[Note])
-def read_notes():
-    return note_service.get_all()
+app = FastAPI()
 
-@app.post("/notes", response_model=Note, status_code=status.HTTP_201_CREATED)
-def create_note(note: NoteCreate):
-    return note_service.create(note)
+models.Base.metadata.create_all(bind=database.engine)
 
-@app.put("/notes/{note_id}", response_model=Note)
-def update_note(note_id: str, note: NoteCreate):
-    updated = note_service.update(note_id, note)
-    if not updated:
-        raise HTTPException(status_code=404, detail="Note not found")
-    return updated
+@app.get("/notes", response_model=List[models.NoteOutput])
+def get_notes(db: Session = Depends(database.get_db)):
+    return db.query(models.NoteTable).all()
 
-@app.delete("/notes/{note_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_note(note_id: str):
-    success = note_service.delete(note_id)
-    if not success:
-        raise HTTPException(status_code=404, detail="Note not found")
-    return
+@app.post("/notes", response_model=models.NoteOutput)
+def create_note(note: models.NoteInput, db: Session = Depends(database.get_db)):
+    new_note = models.NoteTable(
+        title=note.title,
+        content=note.content
+    )
+    db.add(new_note)
+    db.commit()
+    db.refresh(new_note)
+    return new_note
+
+@app.put("/notes/{note_id}", response_model=models.NoteOutput)
+def update_note(note_id: str, note: models.NoteInput, db: Session = Depends(database.get_db)):
+    db_note = db.query(models.NoteTable).filter(models.NoteTable.id == note_id).first()
+    
+    if not db_note:
+        raise HTTPException(status_code=404, detail="Catatan tidak ditemukan")
+    
+    db_note.title = note.title
+    db_note.content = note.content
+    
+    db.commit()
+    db.refresh(db_note)
+    return db_note
+
+@app.delete("/notes/{note_id}")
+def delete_note(note_id: str, db: Session = Depends(database.get_db)):
+    db_note = db.query(models.NoteTable).filter(models.NoteTable.id == note_id).first()
+    
+    if not db_note:
+        raise HTTPException(status_code=404, detail="Catatan tidak ditemukan")
+    
+    db.delete(db_note)
+    db.commit()
+    return {"message": "Berhasil dihapus"}
