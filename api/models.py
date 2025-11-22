@@ -2,7 +2,17 @@ from sqlalchemy import Column, String, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, ConfigDict
 from .database import Base
+from datetime import datetime
 import uuid
+
+class ScheduleTable(Base):
+    __tablename__ = "schedules"
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    title = Column(String)
+    alarm_time = Column(String)
+    owner_id = Column(String, ForeignKey("users.id"))
+    
+    owner = relationship("UserTable")
 
 class UserTable(Base):
     __tablename__ = "users"
@@ -20,6 +30,15 @@ class NoteTable(Base):
     owner_id = Column(String, ForeignKey("users.id"))
     
     owner = relationship("UserTable", back_populates="notes")
+
+class ScheduleInput(BaseModel):
+    title: str
+    alarm_time: str
+
+class ScheduleOutput(ScheduleInput):
+    id: str
+    owner_id: str
+    model_config = ConfigDict(from_attributes=True)
 
 class UserCreate(BaseModel):
     username: str

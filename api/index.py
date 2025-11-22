@@ -113,3 +113,45 @@ def delete_note(
     db.delete(db_note)
     db.commit()
     return {"message": "Deleted"}
+
+
+@app.get("/schedules", response_model=List[models.ScheduleOutput])
+def get_schedules(
+    db: Session = Depends(database.get_db),
+    current_user: models.UserTable = Depends(get_current_user)
+):
+    return db.query(models.ScheduleTable).filter(models.ScheduleTable.owner_id == current_user.id).all()
+
+@app.post("/schedules", response_model=models.ScheduleOutput)
+def create_schedule(
+    schedule: models.ScheduleInput,
+    db: Session = Depends(database.get_db),
+    current_user: models.UserTable = Depends(get_current_user)
+):
+    new_schedule = models.ScheduleTable(
+        title=schedule.title,
+        alarm_time=schedule.alarm_time,
+        owner_id=current_user.id
+    )
+    db.add(new_schedule)
+    db.commit()
+    db.refresh(new_schedule)
+    return new_schedule
+
+@app.delete("/schedules/{schedule_id}")
+def delete_schedule(
+    schedule_id: str,
+    db: Session = Depends(database.get_db),
+    current_user: models.UserTable = Depends(get_current_user)
+):
+    db_schedule = db.query(models.ScheduleTable).filter(
+        models.ScheduleTable.id == schedule_id, 
+        models.ScheduleTable.owner_id == current_user.id
+    ).first()
+    
+    if not db_schedule:
+        raise HTTPException(status_code=404, detail="Schedule not found")
+        
+    db.delete(db_schedule)
+    db.commit()
+    return {"message": "Deleted"}
